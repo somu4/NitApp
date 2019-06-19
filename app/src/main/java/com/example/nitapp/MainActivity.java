@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     ViewPager viewPager = null;
     MenuItem prevMenuItem = null;
     BottomNavigationView bottomNavigationView;
-    int tim=0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,15 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onResume() {
-        if(tim==0) {
-            Intent splashIntent = new Intent(this, SplashScreen.class);
-            startActivity(splashIntent);
-            tim=1;
-        }
-        super.onResume();
-    }
+
 
     BottomNavigationView.OnNavigationItemSelectedListener navListner = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
