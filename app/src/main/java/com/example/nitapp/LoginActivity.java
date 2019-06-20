@@ -1,6 +1,7 @@
 package com.example.nitapp;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,6 +9,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -34,8 +38,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        database = FirebaseDatabase.getInstance();
-        myRef = database.getReference("Students");
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -65,18 +67,44 @@ public class LoginActivity extends AppCompatActivity {
     {
         if(firebaseUser!=null)
         {
-            Toast.makeText(this,"NotNULL",Toast.LENGTH_LONG).show();
+            Toast.makeText(this,"NotNULL user",Toast.LENGTH_LONG).show();
+            Intent intent=new Intent(LoginActivity.this,MainActivity.class);
+            startActivity(intent);
         }
         else
         {
 
-            Toast.makeText(this,"NULL",Toast.LENGTH_LONG).show();
+            Toast.makeText(this,"NULL User",Toast.LENGTH_LONG).show();
         }
     }
 
 
     public void register(View view) {
-        Intent intent=new Intent(LoginActivity.this,RegisterActivity.class);
+        Intent intent=new Intent(LoginActivity.this,IntermediateActivity.class);
         startActivity(intent);
+    }
+
+    public void login(View view) {
+
+        String roll=rollET.getText().toString();
+        String password=passwordET.getText().toString();
+
+        mAuth.signInWithEmailAndPassword(roll+"@p.com", password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            updateUI(user);
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w("logging in", "signInWithEmail:failure", task.getException());
+                            Toast.makeText(getApplicationContext(), "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                            updateUI(null);
+                        }
+
+                    }
+                });
     }
 }

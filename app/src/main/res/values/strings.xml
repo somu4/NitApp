@@ -1,3 +1,50 @@
 <resources>
-    <string name="app_name">NitApp</string>
+    <string name="app_name">login</string>
+    <string name="spinner_branch">Select Branch</string>
+    <string name="spinner_year">Year</string>
+
+    <string-array name="branches">
+        <item>---Select Branch---</item>
+        <item>Computer Science and Engineering</item>
+        <item>Mechanical Engineering</item>
+        <item>Civil Engineering</item>
+        <item>Electronics and Communication Engineering</item>
+        <item>Electrical and Electronics Engineering</item>
+        <item>Metallurgical and Materials Engineering</item>
+        <item>Production Engineering</item>
+
+    </string-array>
+
+
+    <string-array name="hostels">
+        <item>A</item>
+        <item>B</item>
+        <item>C</item>
+        <item>D</item>
+        <item>E</item>
+        <item>F</item>
+        <item>G</item>
+        <item>H</item>
+        <item>I</item>
+        <item>J</item>
+        <item>K</item>
+
+    </string-array>
+
+    <string-array name="departments">
+        <item>Chemistry</item>
+        <item>Civil Engineering</item>
+        <item>Computer Applications</item>
+        <item>Computer Science and Engineering</item>
+        <item>Electrical Engineering</item>
+        <item>Electronics and Communication Engineering</item>
+        <item>Humanities, Social Sciences and Management</item>
+        <item>Mathematics</item>
+        <item>Mechanical Engineering</item>
+        <item>Metallurgical and Materials Engineering</item>
+        <item>Physics</item>
+        <item>Production and Industrial Engineering</item>
+    </string-array>
+
+
 </resources>
