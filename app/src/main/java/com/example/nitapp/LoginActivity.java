@@ -3,6 +3,8 @@ package com.example.nitapp;
 import android.app.Dialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,7 +26,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
-    EditText rollET, passwordET;
+    TextInputLayout rollET, passwordET;
     int tim = 0;
 
     @Override
@@ -56,7 +58,7 @@ public class LoginActivity extends AppCompatActivity {
 
     public void updateUI(FirebaseUser firebaseUser) {
         if (firebaseUser != null) {
-            //Toast.makeText(this, "NotNULL user", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "logging in", Toast.LENGTH_LONG).show();
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
@@ -89,8 +91,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void login(View view) {
-        String roll = rollET.getText().toString();
-        String password = passwordET.getText().toString();
+        String roll = rollET.getEditText().getText().toString();
+        String password = passwordET.getEditText().getText().toString();
 
         if (roll.isEmpty()) {
             Toast.makeText(this, "Roll-no is not Entered !!", Toast.LENGTH_SHORT).show();
@@ -108,7 +110,7 @@ public class LoginActivity extends AppCompatActivity {
                                 Log.w("logging in", "signInWithEmail:failure", task.getException());
                                 Toast.makeText(getApplicationContext(), "Authentication failed.",
                                         Toast.LENGTH_SHORT).show();
-                                updateUI(null);
+                                //updateUI(null);
                             }
 
                         }

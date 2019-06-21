@@ -88,7 +88,7 @@ public class StudentSignUp extends AppCompatActivity implements AdapterView.OnIt
 
     public void userSignUp(View view) {
 
-        if (checkValid() == true) {
+        if (checkValid()) {
 
 
             String rollno = textInputLayoutStudentRoll.getEditText().getText().toString().trim();
