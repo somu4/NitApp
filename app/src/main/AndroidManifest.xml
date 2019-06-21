@@ -13,7 +13,6 @@
         android:theme="@style/AppTheme">
         <activity android:name=".StudentSignUp"></activity>
         <activity android:name=".IntermediateActivity" />
-        <activity android:name=".RegisterActivity" />
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
