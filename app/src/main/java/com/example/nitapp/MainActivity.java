@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_logout) {
             Toast.makeText(this, "clicked on logout", Toast.LENGTH_SHORT).show();
             FirebaseAuth.getInstance().signOut();
-            Intent intent=new Intent(MainActivity.this,LoginActivity.class);
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             return true;

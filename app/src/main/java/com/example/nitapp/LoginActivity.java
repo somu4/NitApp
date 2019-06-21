@@ -23,9 +23,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
-    FirebaseDatabase database;
-    DatabaseReference myRef;
-
     private FirebaseAuth mAuth;
     EditText rollET, passwordET;
     int tim = 0;
@@ -69,8 +66,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void register(View view) {
-        /*Intent intent = new Intent(LoginActivity.this, IntermediateActivity.class);
-        startActivity(intent);*/
         Dialog intermediate_dialog = new Dialog(this);
         intermediate_dialog.setContentView(R.layout.intermediate_dialog);
         Button reg_student_btn = intermediate_dialog.getWindow().findViewById(R.id.reg_student);
