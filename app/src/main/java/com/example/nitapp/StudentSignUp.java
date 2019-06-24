@@ -167,7 +167,6 @@ public class StudentSignUp extends AppCompatActivity implements AdapterView.OnIt
             textInputLayoutStudentRoll.setError(null);
         }
 
-
         //Check if  Password is Empty
         if (password.isEmpty()) {
             textInputLayoutStudentPassword.setError("Password is required.");
