@@ -83,7 +83,7 @@ public class LoginActivity extends AppCompatActivity {
         reg_teacher_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), StudentSignUp.class);
+                Intent intent = new Intent(getApplicationContext(), ProfessorSignUp.class);
                 startActivity(intent);
                 finish();
             }
