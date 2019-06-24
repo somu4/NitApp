@@ -5,12 +5,15 @@
 
     <string-array name="branches">
         <item>---Select Branch---</item>
-        <item>Computer Science and Engineering</item>
-        <item>Mechanical Engineering</item>
         <item>Civil Engineering</item>
+        <item>Computer Science and Engineering</item>
+
+
         <item>Electronics and Communication Engineering</item>
         <item>Electrical and Electronics Engineering</item>
+        <item>Mechanical Engineering</item>
         <item>Metallurgical and Materials Engineering</item>
+
         <item>Production Engineering</item>
 
     </string-array>

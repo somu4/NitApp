@@ -76,6 +76,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), StudentSignUp.class);
                 startActivity(intent);
+                finish();
             }
         });
         Button reg_teacher_btn = intermediate_dialog.getWindow().findViewById(R.id.reg_teacher);
@@ -84,6 +85,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), StudentSignUp.class);
                 startActivity(intent);
+                finish();
             }
         });
         intermediate_dialog.setCanceledOnTouchOutside(true);
