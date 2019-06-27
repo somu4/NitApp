@@ -1,22 +1,40 @@
 package com.example.nitapp;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+
+import static android.webkit.ConsoleMessage.MessageLevel.LOG;
+import static android.widget.Toast.LENGTH_LONG;
 
 public class ScheduleFragment extends Fragment {
 
@@ -26,6 +44,12 @@ public class ScheduleFragment extends Fragment {
     public String TeachernameKey = "teachername";
     public String RoomnoKey = "roomno";
     boolean access = false;
+
+    Context context;
+    MainActivity mainActivity;
+
+    DatabaseReference myRef;
+
     class Node {
         String teacher_name, subject_name, subject_code, room_no;
 
@@ -42,40 +66,106 @@ public class ScheduleFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
         View view = inflater.inflate(R.layout.fragment_schedule, container, false);
-        generateObjectArrayNode(view);
 
-        String[] string_year = {"2016", "2017", "2018", "2019"};
-        String[] string_ugpg = {"UG"};
-        String[] string_branch = {"CE", "CSE", "ECE", "EEE", "ME","MME","PIE"};
+        context = getContext();
+        mainActivity = (MainActivity) getActivity();
+
+        Toast.makeText(getContext(), mainActivity.myBranch + mainActivity.myYear + "!", Toast.LENGTH_SHORT).show();
+
+        setDialogBox(view);
+        fetchingButtonInfo(view);
+
         Spinner spin_year = view.findViewById(R.id.spinner1);
-        ArrayAdapter<String> adapter1 = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, string_year);
-        adapter1.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+        ArrayList<String> years = new ArrayList<String>();
+        int thisYear = Calendar.getInstance().get(Calendar.YEAR);
+        for (int i = thisYear; i >= thisYear - 4; i--) {
+            years.add(Integer.toString(i));
+        }
+
+        ArrayAdapter<String> adapter1 = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, years);
+        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spin_year.setAdapter(adapter1);
-        spin_year.setSelection(adapter1.getPosition("2018"));
+        spin_year.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
-        Spinner spin_ugpg = view.findViewById(R.id.spinner2);
-        ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, string_ugpg);
-        adapter2.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-        spin_ugpg.setAdapter(adapter2);
-        spin_ugpg.setSelection(adapter2.getPosition("UG"));
+            }
 
-        Spinner spin_branch = view.findViewById(R.id.spinner3);
-        ArrayAdapter<String> adapter3 = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, string_branch);
-        adapter3.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-        spin_branch.setAdapter(adapter3);
-        spin_branch.setSelection(adapter3.getPosition("CSE"));
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
         return view;
     }
 
-    public void generateObjectArrayNode(View view) {
+    public void fetchingButtonInfo(View view) {
+
+        char x = 'b', y = '1';
+        for (int i = 1; i <= 40; i++) {
+            final String sId = Character.toString(x) + "" + Character.toString(y);
+            final int j = i;
+
+            DatabaseReference myRef2, myRef3;
+            myRef2 = FirebaseDatabase.getInstance().getReference("schedule").child((mainActivity.myBranch).toUpperCase()).child(mainActivity.myYear).child("table").child(sId).child("subcode");
+            myRef2.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    String s = dataSnapshot.getValue(String.class);
+                    setButtonText(sId, s, getView());
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    Toast.makeText(getContext(), "Error in fetching Schedule Fragment Setting ButtonText", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            myRef3 = FirebaseDatabase.getInstance().getReference("schedule").child((mainActivity.myBranch).toUpperCase()).child(mainActivity.myYear).child("table").child(sId).child("lecture");
+            myRef3.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Boolean value = dataSnapshot.getValue(Boolean.class);
+                    setButtonColor(sId, value, getView());
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    Toast.makeText(getContext(), "Error in fetching Schedule Fragment Setting ButtonColor", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            y++;
+            if (y > '5') {
+                y = '1';
+                x++;
+            }
+        }
+    }
+
+    private void setButtonText(String sId1, String data, View view) {
+        int id1 = getResources().getIdentifier(sId1, "id", getActivity().getPackageName());
+        Button button1 = view.findViewById(id1);
+        button1.setText(data);
+    }
+
+
+    private void setButtonColor(String sId1, boolean b, View view) {
+        int id1 = getResources().getIdentifier(sId1, "id", getActivity().getPackageName());
+        Button button1 = view.findViewById(id1);
+        if (b == true)
+            button1.setBackgroundColor(Color.GREEN);
+        else
+            button1.setBackgroundColor(Color.RED);
+    }
+
+    private void setDialogBox(View view) {
+
         node = new Node[41];
         for (int i = 0; i < 41; i++)
             node[i] = new Node();
-        setButtons(view);
-    }
 
-    private void setButtons(View view) {
         char x = 'b', y = '1';
         for (int i = 1; i <= 40; i++) {
             final String sId = Character.toString(x) + "" + Character.toString(y);
@@ -89,8 +179,8 @@ public class ScheduleFragment extends Fragment {
                 node[i].room_no = "204";
 
                 Button button = view.findViewById(id);
-                button.setText("CS501");
                 button.setBackgroundColor(Color.GREEN);
+
                 ViewGroup.LayoutParams lp = button.getLayoutParams();
                 ((LinearLayout.LayoutParams) lp).setMargins(2, 0, 3, 0);
                 button.setOnClickListener(new View.OnClickListener() {
@@ -99,6 +189,7 @@ public class ScheduleFragment extends Fragment {
                     Dialog teacher_dialog = new Dialog(getContext());
                     TextView subject_code_dialog, subject_dialog, room_dialog;
                     Dialog student_dialog = new Dialog(getContext());
+
                     @Override
                     public void onClick(View v) {
                         if (access == true) {
@@ -136,13 +227,10 @@ public class ScheduleFragment extends Fragment {
                                     teacher_dialog.dismiss();
                                 }
                             });
-
                             teacher_dialog.setCanceledOnTouchOutside(true);
                             teacher_dialog.show();
                         } else {
-
                             student_dialog.setContentView(R.layout.schedule_student_dialog);
-
                             Button teacher_info;
                             teacher_info = student_dialog.getWindow().findViewById(R.id.dialog_teacher);
                             subject_code_dialog = student_dialog.getWindow().findViewById(R.id.dialog_subject_code);
@@ -167,8 +255,8 @@ public class ScheduleFragment extends Fragment {
                     }
                 });
             }
-            y++;
 
+            y++;
             if (y > '5') {
                 y = '1';
                 x++;
@@ -180,11 +268,5 @@ public class ScheduleFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
     }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
 
 }

@@ -136,6 +136,7 @@ public class StudentSignUp extends AppCompatActivity implements AdapterView.OnIt
 
                                 Toast.makeText(getApplicationContext(), "Successful",
                                         Toast.LENGTH_SHORT).show();
+
                                 updateDatabase();
                                 Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                                 startActivity(intent);

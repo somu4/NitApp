@@ -7,15 +7,22 @@
         <item>---Select Branch---</item>
         <item>Civil Engineering</item>
         <item>Computer Science and Engineering</item>
-
-
         <item>Electronics and Communication Engineering</item>
         <item>Electrical and Electronics Engineering</item>
         <item>Mechanical Engineering</item>
         <item>Metallurgical and Materials Engineering</item>
-
         <item>Production Engineering</item>
 
+    </string-array>
+
+    <string-array name="year">
+        <item>2016</item>
+        <item>2017</item>
+        <item>2017</item>
+        <item>2018</item>
+        <item>Mechanical Engineering</item>
+        <item>Metallurgical and Materials Engineering</item>
+        <item>Production Engineering</item>
     </string-array>
 
 

@@ -16,16 +16,34 @@ import android.widget.Toast;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import static android.widget.Toast.LENGTH_LONG;
 
 public class MainActivity extends AppCompatActivity {
+
+    public String myYear, myBranch;
+
     ViewPager viewPager = null;
     MenuItem prevMenuItem = null;
     BottomNavigationView bottomNavigationView;
+
+    DatabaseReference myRef, myRef2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //creating();
+
+
+
+
+        myYear = getIntent().getStringExtra("roll").substring(0, 4);
+        myBranch = getIntent().getStringExtra("roll").substring(6, 8);
+
 
         viewPager = findViewById(R.id.viewPager);
         viewPager.setAdapter(new MyAdapter(getSupportFragmentManager()));
@@ -52,6 +70,39 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void creating() {
+
+        myRef = FirebaseDatabase.getInstance().getReference("schedule").child("CS");
+
+        char x = 'b', y = '1';
+
+        long temp = 2016;
+        for (long j = 0; j < 4; j++,temp++) {
+            myRef2 = myRef.child(temp+"").child("setter");
+            myRef2.setValue("BK SINGH");
+
+
+            for (int i = 1; i <= 40; i++) {
+                String sId = Character.toString(x) + "" + Character.toString(y);
+
+                myRef2 = myRef.child(temp+"").child("table").child(sId);
+                DatabaseReference myref3=myRef2.child("subcode");
+                myref3.setValue("501");
+                myref3=myRef2.child("lecture");
+                myref3.setValue(true);
+
+                y++;
+                if (y > '5') {
+                    y = '1';
+                    x++;
+                }
+            }
+        }
+
+
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

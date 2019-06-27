@@ -60,6 +60,10 @@ public class LoginActivity extends AppCompatActivity {
         if (firebaseUser != null) {
             Toast.makeText(this, "logging in", Toast.LENGTH_LONG).show();
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+
+            intent.putExtra("roll",firebaseUser.getEmail());
+
+
             startActivity(intent);
             finish();
         } else {
