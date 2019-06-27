@@ -9,7 +9,8 @@ public class StudentDataClass {
 
     String hostel;
 
-    public StudentDataClass(String username, String email, String contactNumber, int branch, int gender, int roomNumber, int rollNumber, int year, String  hostel) {
+    public StudentDataClass(String username, String email, String contactNumber, int branch, int gender,
+                            int roomNumber, int rollNumber, int year, String  hostel) {
         this.username = username;
         this.email = email;
         this.contactNumber = contactNumber;
