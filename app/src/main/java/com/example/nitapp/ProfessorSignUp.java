@@ -24,7 +24,8 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class ProfessorSignUp extends AppCompatActivity implements AdapterView.OnItemSelectedListener, View.OnClickListener {
+public class ProfessorSignUp extends AppCompatActivity implements AdapterView.OnItemSelectedListener, View.OnClickListener,
+        RadioGroup.OnCheckedChangeListener{
 
     private TextInputLayout textInputLayoutProfessorName, textInputLayoutProfessorEmployeeID, textInputLayoutProfessorEmail, textInputLayoutProfessorContactNo, textInputLayoutProfessorPassword;
     private RadioGroup radioGroupProfessorGender;
@@ -74,7 +75,7 @@ public class ProfessorSignUp extends AppCompatActivity implements AdapterView.On
         spinnerDepartment.setAdapter(adapter);
         spinnerDepartment.setOnItemSelectedListener(this);
 
-        //radioGroupProfessorGender.setOnCheckedChangeListener(this);
+        radioGroupProfessorGender.setOnCheckedChangeListener( this);
 
 
     } /// end of onCreate
@@ -265,5 +266,10 @@ public class ProfessorSignUp extends AppCompatActivity implements AdapterView.On
 
                 break;
         }
+    }
+
+    @Override
+    public void onCheckedChanged(RadioGroup group, int checkedId) {
+        radioButtonProfessorGender = findViewById(checkedId);
     }
 }

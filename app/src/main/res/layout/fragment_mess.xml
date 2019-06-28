@@ -1,14 +1,144 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/mess_detail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Mess"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:layout_centerInParent="true"/>
-</RelativeLayout>
+        android:ems="4"
+        android:gravity="center"
+        android:text="Hostel J"
+        android:textSize="30sp"
+        android:layout_marginTop="15dp"
+        android:layout_gravity="center_horizontal"
+        android:textColor="#FFFFFF"
+        android:background="#651FFF"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:orientation="horizontal"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp"
+        android:background="#689F38"
+        >
+
+
+        <Button
+            android:id="@+id/breakfast"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Breakfast\n10:00-12:00"
+            android:textSize="12sp"
+            android:background="#76FF03"
+            android:layout_marginLeft="3dp"/>
+
+        <Button
+            android:id="@+id/lunch"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Lunch\n14:00-16:00"
+            android:textSize="12sp"
+            android:background="#76FF03"
+            android:layout_marginLeft="3dp"/>
+
+        <Button
+            android:id="@+id/snacks"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Snack\n18:00-19:00"
+            android:textSize="12sp"
+
+            android:layout_marginLeft="3dp"/>
+
+        <Button
+            android:id="@+id/dinner"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Dinner\n22:00-00:00"
+            android:textSize="12sp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="15dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rate"
+            android:textSize="25dp"
+            android:layout_marginLeft="10dp"
+            android:textColor="#000"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Breakfast"
+            android:textSize="25dp"
+            android:layout_marginLeft="10dp"
+            android:textColor="#000"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="5dp">
+        <RatingBar
+            android:id="@+id/ratingBar1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:numStars="5"
+            />
+
+    </LinearLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="submit"
+        android:background="#2196F3"
+        android:layout_gravity="center_horizontal"
+        android:textSize="20sp"
+        android:layout_marginTop="5dp"
+        android:ems="6"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp">
+        <TextView
+            android:id="@+id/avgratingtext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Avg. Rating"
+            android:textSize="20sp"
+            android:textColor="#000"
+            android:gravity="center"/>
+
+        <RatingBar
+            android:id="@+id/ratingBar2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/avgratingtext"
+            android:layout_alignBaseline="@+id/avgratingtext"
+            android:numStars="5" />
+    </RelativeLayout>
+
+
+</LinearLayout>

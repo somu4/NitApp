@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -28,6 +29,7 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     TextInputLayout rollET, passwordET;
     int tim = 0;
+    ProgressBar progressBarLoginActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +39,7 @@ public class LoginActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         rollET = findViewById(R.id.roll_login);
         passwordET = findViewById(R.id.password_login);
+        progressBarLoginActivity = findViewById(R.id.progressbar_login_activity);
     }
 
     @Override
@@ -54,16 +57,18 @@ public class LoginActivity extends AppCompatActivity {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         updateUI(currentUser);
+
     }
 
     public void updateUI(FirebaseUser firebaseUser) {
         if (firebaseUser != null) {
-            Toast.makeText(this, "logging in", Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, "logging in", Toast.LENGTH_LONG).show();
+            finish();
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
-            finish();
+
         } else {
-            Toast.makeText(this, "NULL User", Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, "NULL User", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -101,17 +106,18 @@ public class LoginActivity extends AppCompatActivity {
         } else if (password.isEmpty()) {
             Toast.makeText(this, "Password is not Entered !!", Toast.LENGTH_SHORT).show();
         } else {
+            progressBarLoginActivity.setVisibility(View.VISIBLE);
             mAuth.signInWithEmailAndPassword(roll + "@p.com", password)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
+                            progressBarLoginActivity.setVisibility(View.GONE);
                             if (task.isSuccessful()) {
                                 FirebaseUser user = mAuth.getCurrentUser();
                                 updateUI(user);
                             } else {
-                                Log.w("logging in", "signInWithEmail:failure", task.getException());
-                                Toast.makeText(getApplicationContext(), "Authentication failed.",
-                                        Toast.LENGTH_SHORT).show();
+                                //Log.w("logging in", "signInWithEmail:failure", task.getException());
+                                Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                 //updateUI(null);
                             }
 
