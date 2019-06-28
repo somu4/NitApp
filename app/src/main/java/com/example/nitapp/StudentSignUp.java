@@ -10,7 +10,10 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -19,6 +22,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -27,20 +31,25 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class StudentSignUp extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class StudentSignUp extends AppCompatActivity implements AdapterView.OnItemSelectedListener,
+        RadioGroup.OnCheckedChangeListener,View.OnClickListener{
 
     private FirebaseAuth mAuth;
     private FirebaseDatabase database;
     private DatabaseReference myRef;
 
-    private TextInputLayout textInputLayoutStudentName, textInputLayoutStudentEmail, textInputLayoutStudentContactNo, textInputLayoutStudentRoll, textInputLayoutStudentPassword;
+    private TextInputLayout textInputLayoutStudentName, textInputLayoutStudentEmail, textInputLayoutStudentContactNo, textInputLayoutStudentPassword;
     private Spinner spinnerBranch, spinnerYear, spinnerRollNo, spinnerHostel;
     private RadioGroup radioGroupGender;
+    private Button buttonStudentSignUp;
     EditText editTextRoomNo;
+    RadioButton radioButtonStudentGender;
+    ProgressBar progressBarStudentActivity;
 
-    String username, email, contactNumber;
-    int branch, gender, roomNumber, rollNumber, year;
+    private String username, email, contactNumber,
+             gender, roomNumber, year,password , rollNumber;
     String hostel;
+    int branch;
 
     String branchCode;
 
@@ -58,7 +67,6 @@ public class StudentSignUp extends AppCompatActivity implements AdapterView.OnIt
         textInputLayoutStudentName = findViewById(R.id.text_input_layout_student_name);
         textInputLayoutStudentEmail = findViewById(R.id.text_input_layout_student_email);
         textInputLayoutStudentContactNo = findViewById(R.id.text_input_layout_student_contactno);
-        textInputLayoutStudentRoll = findViewById(R.id.text_input_layout_student_roll);
         textInputLayoutStudentPassword = findViewById(R.id.text_input_layout_student_password);
         spinnerBranch = findViewById(R.id.spinner_branch);
         spinnerYear = findViewById(R.id.spinner_year);
@@ -66,9 +74,17 @@ public class StudentSignUp extends AppCompatActivity implements AdapterView.OnIt
         spinnerHostel = findViewById(R.id.spinner_hostel);
         editTextRoomNo = findViewById(R.id.edit_text_roomno);
         radioGroupGender = findViewById(R.id.gender);
+        int selectedId = radioGroupGender.getCheckedRadioButtonId();
 
-        branch = 0;
-        branchCode = "";
+        // find the radiobutton by returned id
+        radioButtonStudentGender = findViewById(selectedId);
+        buttonStudentSignUp = findViewById(R.id.buttonStudentSignUp);
+        progressBarStudentActivity = findViewById(R.id.progressbar_student_activity);
+
+
+
+
+
 
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.branches, android.R.layout.simple_list_item_1);
@@ -106,21 +122,18 @@ public class StudentSignUp extends AppCompatActivity implements AdapterView.OnIt
         spinnerHostel.setAdapter(adapter4);
         spinnerHostel.setOnItemSelectedListener(this);
 
-        radioGroupGender.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                if (i == R.id.gendermale)
-                    gender = 0;
-                else
-                    gender = 1;
-            }
-        });
+        radioGroupGender.setOnCheckedChangeListener( this);
+        buttonStudentSignUp.setOnClickListener( this);
+
+
+
     }
 
-    public void userSignUp(View view) {
+    public void userSignUp() {
 
         if (checkValid()) {
 
+            progressBarStudentActivity.setVisibility(View.VISIBLE);
 
             String userId = year + "UG" + branchCode + rollNumber;
             String password = textInputLayoutStudentPassword.getEditText().getText().toString().trim();
@@ -130,40 +143,65 @@ public class StudentSignUp extends AppCompatActivity implements AdapterView.OnIt
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
+
                             if (task.isSuccessful()) {
-                                // Sign in success, update UI with the signed-in user's information
-                                Log.d("Student Sign Up", "createUserWithEmail:success");
 
-                                Toast.makeText(getApplicationContext(), "Successful",
-                                        Toast.LENGTH_SHORT).show();
+                                StudentDataClass studentDataClass = new StudentDataClass(username, email, contactNumber,
+                                        rollNumber,branch,  year, hostel, roomNumber, gender);
 
-                                updateDatabase();
-                                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                                startActivity(intent);
-                                finish();
+                                myRef = database.getReference("student").child(branchCode).child(year + "");
+
+
+                                String uid = mAuth.getCurrentUser().getUid();
+                                studentDataClass.setUid( uid);
+
+                                myRef.child(uid).setValue(studentDataClass).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        progressBarStudentActivity.setVisibility(View.GONE);
+                                        if (task.isSuccessful()) {
+                                            Toast.makeText(StudentSignUp.this, "User  Registration Successful", Toast.LENGTH_SHORT).show();
+                                            finish();
+                                            Intent intent = new Intent(StudentSignUp.this, LoginActivity.class);
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                            startActivity(intent);
+                                        }
+                                    }
+                                });
+
+
                             } else {
-                                // If sign in fails, display a message to the user.
-                                Log.w("Student Sign Up", "createUserWithEmail:failure", task.getException());
-                                Toast.makeText(getApplicationContext(), "Authentication failed.",
-                                        Toast.LENGTH_SHORT).show();
-                                //updateUI(null);
-                            }
+                                progressBarStudentActivity.setVisibility(View.GONE);
+                                if (task.getException() instanceof FirebaseAuthUserCollisionException) {
 
-                            // ...
+                                    Toast.makeText(StudentSignUp.this, "You are already registered.", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText( StudentSignUp.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
                         }
                     });
+
+
         }
-    }
+
+    } // end of professorSignUp
 
     public boolean checkValid() {
-        String name = textInputLayoutStudentName.getEditText().getText().toString().trim();
-        String email = textInputLayoutStudentEmail.getEditText().getText().toString().trim();
-        String phoneno = textInputLayoutStudentContactNo.getEditText().getText().toString().trim();
-        String rollno = textInputLayoutStudentRoll.getEditText().getText().toString().trim();
-        String password = textInputLayoutStudentPassword.getEditText().getText().toString().trim();
+        username = textInputLayoutStudentName.getEditText().getText().toString().trim();
+        email = textInputLayoutStudentEmail.getEditText().getText().toString().trim();
+        contactNumber = textInputLayoutStudentContactNo.getEditText().getText().toString().trim();
+        roomNumber = editTextRoomNo.getText().toString().trim();
+        password = textInputLayoutStudentPassword.getEditText().getText().toString().trim();
+        year = spinnerYear.getSelectedItem().toString().trim();
+        rollNumber = spinnerRollNo.getSelectedItem().toString().trim();
+        hostel = spinnerHostel.getSelectedItem().toString().trim();
+        roomNumber = editTextRoomNo.getText().toString();
+        gender = radioButtonStudentGender.getText().toString().trim();
+
 
         //Check if Name is Empty
-        if (name.isEmpty()) {
+        if (username.isEmpty()) {
             textInputLayoutStudentName.setError("Name is required");
             return false;
         } else {
@@ -186,21 +224,20 @@ public class StudentSignUp extends AppCompatActivity implements AdapterView.OnIt
             textInputLayoutStudentEmail.setError(null);
         }
 
-        //Check if Roll No. is Empty
-        if (rollno.isEmpty()) {
-            textInputLayoutStudentContactNo.setError("Roll No. is required.");
+        //Check if contact is Empty
+        if (contactNumber.isEmpty()) {
+            textInputLayoutStudentContactNo.setError("Contact Number is required.");
             return false;
 
         } else {
             textInputLayoutStudentContactNo.setError(null);
         }
 
-        //Check if UserName is Empty
-        if (rollno.isEmpty()) {
-            textInputLayoutStudentRoll.setError("RollNo is required.");
+        //Check if Room number is Empty
+        if (roomNumber.isEmpty()) {
+            Toast.makeText(StudentSignUp.this, "Enter your Room Number", Toast.LENGTH_SHORT).show();
+            editTextRoomNo.requestFocus();
             return false;
-        } else {
-            textInputLayoutStudentRoll.setError(null);
         }
 
         //Check if  Password is Empty
@@ -221,22 +258,6 @@ public class StudentSignUp extends AppCompatActivity implements AdapterView.OnIt
         return true;
     }
 
-    public void updateDatabase() {
-        username = textInputLayoutStudentName.getEditText().getText().toString().trim();
-        email = textInputLayoutStudentEmail.getEditText().getText().toString().trim();
-        contactNumber = textInputLayoutStudentContactNo.getEditText().getText().toString().trim();
-        roomNumber = Integer.valueOf(editTextRoomNo.getText().toString());
-
-        StudentDataClass studentDataClass = new StudentDataClass(username, email, contactNumber, branch, gender, roomNumber, rollNumber, year, hostel);
-        String path = "student" + branchCode + "" + year;
-        myRef = database.getReference("student").child(branchCode).child(year + "");
-
-
-        String uid = myRef.push().getKey();
-        studentDataClass.uid = uid;
-
-        myRef.child(uid).setValue(studentDataClass);
-    }
 
 
     @Override
@@ -261,13 +282,8 @@ public class StudentSignUp extends AppCompatActivity implements AdapterView.OnIt
                 branchCode = "PI";
 
 
-        } else if (adapterView.getId() == R.id.spinner_year) {
-            year = Integer.valueOf(adapterView.getItemAtPosition(i).toString());
-        } else if (adapterView.getId() == R.id.spinner_rollno) {
-            rollNumber = Integer.valueOf(adapterView.getItemAtPosition(i).toString());
-        } else if (adapterView.getId() == R.id.spinner_hostel) {
-            hostel = adapterView.getItemAtPosition(i).toString();
         }
+
     }
 
     @Override
@@ -279,5 +295,23 @@ public class StudentSignUp extends AppCompatActivity implements AdapterView.OnIt
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    public void onCheckedChanged(RadioGroup group, int checkedId) {
+        radioButtonStudentGender = findViewById(checkedId);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.buttonStudentSignUp:
+                userSignUp();
+                break;
+            case R.id.textViewLogin:
+                finish();
+                startActivity(new Intent(this, MainActivity.class));
+                break;
+        }
     }
 }

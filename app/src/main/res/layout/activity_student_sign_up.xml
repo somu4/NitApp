@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".StudentSignUp">
 
     <ScrollView
@@ -195,7 +195,8 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Male" />
+                            android:text="Male"
+                            android:checked="true"/>
 
                         <RadioButton
                             android:id="@+id/genderfemale"
@@ -203,26 +204,17 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="Female" />
+                        <RadioButton
+                            android:id="@+id/genderother"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Other" />
 
                     </RadioGroup>
                 </LinearLayout>
             </LinearLayout>
 
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/text_input_layout_student_roll"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:errorEnabled="true">
-
-                <android.support.design.widget.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/ic_person_black_24dp"
-                    android:drawablePadding="5dp"
-                    android:hint="Roll Number"
-                    android:inputType="text" />
-
-            </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/text_input_layout_student_password"
@@ -256,15 +248,14 @@
                 android:textColor="#000000" />
 
             <Button
-                android:id="@+id/buttonSignUp"
-                android:layout_width="wrap_content"
+                android:id="@+id/buttonStudentSignUp"
+                android:layout_width="180dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="15dp"
                 android:background="#1A237E"
                 android:clickable="true"
-                android:onClick="userSignUp"
                 android:text="Sign Up"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
@@ -273,4 +264,13 @@
 
     </ScrollView>
 
-</LinearLayout>
+    <ProgressBar
+        android:id="@+id/progressbar_student_activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone" />
+
+
+</RelativeLayout>
