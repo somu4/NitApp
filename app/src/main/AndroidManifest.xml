@@ -19,7 +19,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SplashScreen" />
+        <activity android:name=".SplashScreen"
+            android:theme="@style/Theme.Design.NoActionBar"/>
         <activity android:name=".MainActivity" />
         <activity android:name=".ProfessorSignUp" />
     </application>
