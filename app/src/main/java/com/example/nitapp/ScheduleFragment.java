@@ -72,8 +72,7 @@ public class ScheduleFragment extends Fragment {
 
         Toast.makeText(getContext(), mainActivity.myBranch + mainActivity.myYear + "!", Toast.LENGTH_SHORT).show();
 
-        setDialogBox(view);
-        fetchingButtonInfo(view);
+
 
         Spinner spin_year = view.findViewById(R.id.spinner1);
         ArrayList<String> years = new ArrayList<String>();
@@ -267,6 +266,8 @@ public class ScheduleFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        setDialogBox(getView());
+        fetchingButtonInfo(getView());
     }
 
 }

@@ -29,7 +29,6 @@ public class MainActivity extends AppCompatActivity {
     MenuItem prevMenuItem = null;
     BottomNavigationView bottomNavigationView;
 
-    DatabaseReference myRef, myRef2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,31 +72,46 @@ public class MainActivity extends AppCompatActivity {
 
     private void creating() {
 
+        DatabaseReference myRef,myRef2;
+
         myRef = FirebaseDatabase.getInstance().getReference("schedule").child("CS");
 
-        char x = 'b', y = '1';
 
         long temp = 2016;
         for (long j = 0; j < 4; j++,temp++) {
+
             myRef2 = myRef.child(temp+"").child("setter");
             myRef2.setValue("BK SINGH");
 
+
+            char x = 'b', y = '1';
 
             for (int i = 1; i <= 40; i++) {
                 String sId = Character.toString(x) + "" + Character.toString(y);
 
                 myRef2 = myRef.child(temp+"").child("table").child(sId);
                 DatabaseReference myref3=myRef2.child("subcode");
-                myref3.setValue("501");
+                myref3.setValue("CS501");
                 myref3=myRef2.child("lecture");
                 myref3.setValue(true);
-
                 y++;
                 if (y > '5') {
                     y = '1';
                     x++;
                 }
             }
+
+            for(long k=1;k<=10;k++)
+            {
+                DatabaseReference myRef3=myRef.child(temp+"").child("table").child("subjects").child("sub"+k+"");
+                DatabaseReference myRef4= myRef3.child("subcode");
+                myRef4.setValue("CS501");
+                myRef4=myRef3.child("teachername");
+                myRef4.setValue("Sanjay Kumar");
+                myRef4=myRef3.child("subjectname");
+                myRef4.setValue("Optimisation");
+            }
+
         }
 
 
