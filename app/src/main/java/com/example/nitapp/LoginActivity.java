@@ -27,9 +27,9 @@ import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
-    TextInputLayout rollET, passwordET;
-    int tim = 0;
-    ProgressBar progressBarLoginActivity;
+    private TextInputLayout rollET, passwordET;
+    private int tim = 0;
+    private ProgressBar progressBarLoginActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,13 +62,19 @@ public class LoginActivity extends AppCompatActivity {
 
     public void updateUI(FirebaseUser firebaseUser) {
         if (firebaseUser != null) {
-            //Toast.makeText(this, "logging in", Toast.LENGTH_LONG).show();
-            finish();
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(intent);
+            String email = firebaseUser.getEmail();
+            if(email.charAt(4)=='U'||email.charAt(4)=='u'){
+                finish();
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+            else{
+                finish();
+                Intent intent = new Intent(LoginActivity.this, Main2Activity.class);
+                startActivity(intent);
+            }
 
-        } else {
-            //Toast.makeText(this, "NULL User", Toast.LENGTH_LONG).show();
+
         }
     }
 

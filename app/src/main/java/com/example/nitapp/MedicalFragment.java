@@ -10,8 +10,8 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 public class MedicalFragment extends Fragment {
-    RelativeLayout calldoctorButton;
-    RelativeLayout callambulanceButton;
+    private RelativeLayout calldoctorButton;
+    private RelativeLayout callambulanceButton;
 
 
     @Override

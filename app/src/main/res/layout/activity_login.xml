@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:drawableLeft="@drawable/ic_person_black_24dp"
                 android:drawablePadding="5dp"
-                android:hint="Roll Number"
+                android:hint="Roll Number/ Employee ID"
                 android:inputType="text" />
 
         </android.support.design.widget.TextInputLayout>

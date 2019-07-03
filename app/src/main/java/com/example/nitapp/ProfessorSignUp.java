@@ -162,6 +162,22 @@ public class ProfessorSignUp extends AppCompatActivity implements AdapterView.On
             return false;
         }
 
+        //Check if Employee ID  is Empty
+        if (professorEmployeeID.isEmpty()) {
+            textInputLayoutProfessorEmployeeID.setError("Employee ID is required.");
+            textInputLayoutProfessorEmployeeID.requestFocus();
+            return false;
+        }
+        else if (professorEmployeeID.length() != 8) {
+            textInputLayoutProfessorEmployeeID.setError("Enter a valid EmployeeID 8 digits");// correct it
+            textInputLayoutProfessorEmployeeID.requestFocus();
+            return false;
+        }
+
+        else {
+            textInputLayoutProfessorEmployeeID.setError(null);
+        }
+
 
         //Check if E-mail is Empty
         if (professorEmail.isEmpty()) {

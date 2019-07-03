@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="250dp"
     android:layout_height="150dp"
     android:layout_gravity="center"
-    android:background="#99FFC107"
+    android:background="@color/colorThemeLight"
     android:orientation="vertical">
 
     <TextView
@@ -18,24 +19,32 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_margin="5dp"
         android:layout_weight="1">
 
         <Button
             android:id="@+id/reg_student"
-            android:layout_width="wrap_content"
+
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
             android:text="STUDENT"
+            android:textColor="#ffffff"
+            android:background="@color/colorPrimary"
+            android:layout_marginRight="5dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
 
         <Button
             android:id="@+id/reg_teacher"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
             android:text="TEACHER"
+            android:textColor="#ffffff"
+            android:background="@color/colorPrimary"
+            android:layout_marginLeft="5dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
     </LinearLayout>
 

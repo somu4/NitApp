@@ -73,7 +73,7 @@
                     android:drawableLeft="@drawable/ic_perm_identity_black_24dp"
                     android:drawablePadding="5dp"
                     android:hint="Employee ID"
-                    android:inputType="text" />
+                    android:inputType="number" />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -200,7 +200,7 @@
                 android:text="Sign Up"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
-                android:textSize="18sp" />
+                android:textSize="22sp" />
 
         </LinearLayout>
 

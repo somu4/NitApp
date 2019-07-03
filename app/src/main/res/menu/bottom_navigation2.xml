@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_schedule2"
+        android:icon="@drawable/ic_schedule_black"
+        android:title="Schedule2"/>
+
+
+    <item
+        android:id="@+id/nav_mess2"
+        android:icon="@drawable/ic_mess_black"
+        android:title="Mess2"/>
+    <item
+        android:id="@+id/nav_medical2"
+        android:icon="@drawable/ic_medical_black"
+        android:title="Medical2"/>
+
+
+</menu>

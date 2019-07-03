@@ -2,6 +2,9 @@
     <string name="app_name">login</string>
     <string name="spinner_branch">Select Branch</string>
     <string name="spinner_year">Year</string>
+    <string name="open_navigation_drawer">open navigation drawer</string>
+    <string name="close_navigation_drawer">close navigation drawer</string>
+
 
     <string-array name="branches">
         <item>---Select Branch---</item>
@@ -35,6 +38,7 @@
     </string-array>
 
     <string-array name="departments">
+        <item>Select Department</item>
         <item>Chemistry</item>
         <item>Civil Engineering</item>
         <item>Computer Applications</item>

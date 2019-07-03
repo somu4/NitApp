@@ -42,16 +42,16 @@ public class StudentSignUp extends AppCompatActivity implements AdapterView.OnIt
     private Spinner spinnerBranch, spinnerYear, spinnerRollNo, spinnerHostel;
     private RadioGroup radioGroupGender;
     private Button buttonStudentSignUp;
-    EditText editTextRoomNo;
-    RadioButton radioButtonStudentGender;
-    ProgressBar progressBarStudentActivity;
+    private EditText editTextRoomNo;
+    private RadioButton radioButtonStudentGender;
+    private ProgressBar progressBarStudentActivity;
 
     private String username, email, contactNumber,
              gender, roomNumber, year,password , rollNumber;
-    String hostel;
-    int branch;
+    private String hostel;
+    private int branch;
 
-    String branchCode;
+    private String branchCode;
 
 
     @Override
