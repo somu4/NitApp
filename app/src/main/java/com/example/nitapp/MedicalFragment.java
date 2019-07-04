@@ -9,25 +9,30 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
-public class MedicalFragment extends Fragment {
+import com.google.firebase.auth.FirebaseAuth;
+
+public class MedicalFragment extends Fragment implements View.OnClickListener {
     private RelativeLayout calldoctorButton;
-    private RelativeLayout callambulanceButton;
+    private RelativeLayout callambulanceButton, nearbyHospitalsView;
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState){
-        View view =  inflater.inflate(R.layout.fragment_medical, container,false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_medical, container, false);
 
-        calldoctorButton= view.findViewById(R.id.call_doctor_view);
-        callambulanceButton= view.findViewById(R.id.call_ambulance_view);
+        calldoctorButton = view.findViewById(R.id.call_doctor_view);
+        callambulanceButton = view.findViewById(R.id.call_ambulance_view);
+        nearbyHospitalsView = view.findViewById(R.id.nearby_hospitals_view);
+
+        nearbyHospitalsView.setOnClickListener(this);
 
         callambulanceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i= new Intent( Intent.ACTION_DIAL );
+                Intent i = new Intent(Intent.ACTION_DIAL);
 
-                i.setData( Uri.parse("tel:1234567890"));
-                    startActivity(i);
+                i.setData(Uri.parse("tel:1234567890"));
+                startActivity(i);
 
 
             }
@@ -36,17 +41,33 @@ public class MedicalFragment extends Fragment {
         calldoctorButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i= new Intent( Intent.ACTION_DIAL );
+                Intent i = new Intent(Intent.ACTION_DIAL);
 
-                i.setData( Uri.parse("tel:0987654321"));
-                    startActivity(i);
+                i.setData(Uri.parse("tel:0987654321"));
+                startActivity(i);
 
 
             }
         });
 
 
-
         return view;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.nearby_hospitals_view:
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(getActivity(), LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                getActivity().finish();
+                break;
+            case R.id.call_ambulance_view:
+                break;
+            case R.id.call_doctor_view:
+                break;
+        }
     }
 }

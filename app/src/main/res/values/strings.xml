@@ -53,5 +53,14 @@
         <item>Production and Industrial Engineering</item>
     </string-array>
 
+    <string-array name="complaint_types">
+        <item>Electricity</item>
+        <item>Lan</item>
+        <item>Plumbing</item>
+        <item>Carpentary</item>
+        <item>Washroom Cleaning</item>
+        <item>Other</item>
+    </string-array>
+
 
 </resources>
