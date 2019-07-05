@@ -41,7 +41,13 @@ public class MainActivity extends AppCompatActivity {
 
 
         myYear = getIntent().getStringExtra("roll").substring(0, 4);
+
+        if(getIntent().getStringExtra("roll").length()<16)
+            myYear="2019";
+
         myBranch = getIntent().getStringExtra("roll").substring(6, 8);
+        if(getIntent().getStringExtra("roll").length()<16)
+            myBranch="CS";
 
 
         viewPager = findViewById(R.id.viewPager);
@@ -72,46 +78,63 @@ public class MainActivity extends AppCompatActivity {
 
     private void creating() {
 
-        DatabaseReference myRef,myRef2;
 
-        myRef = FirebaseDatabase.getInstance().getReference("schedule").child("CS");
+        DatabaseReference scheduleRef = FirebaseDatabase.getInstance().getReference("schedule");
 
-
-        long temp = 2016;
-        for (long j = 0; j < 4; j++,temp++) {
-
-            myRef2 = myRef.child(temp+"").child("setter");
-            myRef2.setValue("BK SINGH");
+        String[] branches={"CS","MM","ME","CE","EE","EC","PI"};
 
 
-            char x = 'b', y = '1';
 
-            for (int i = 1; i <= 40; i++) {
-                String sId = Character.toString(x) + "" + Character.toString(y);
 
-                myRef2 = myRef.child(temp+"").child("table").child(sId);
-                DatabaseReference myref3=myRef2.child("subcode");
-                myref3.setValue("CS501");
-                myref3=myRef2.child("lecture");
-                myref3.setValue(true);
-                y++;
-                if (y > '5') {
-                    y = '1';
-                    x++;
+        for(int p=0;p<7;p++) {
+
+            long temp = 2016;
+
+            DatabaseReference branchRef=scheduleRef.child(branches[p]);
+
+            DatabaseReference hodRef=branchRef.child("hod");
+
+            hodRef.setValue("*");
+
+            for (long j = 0; j < 4; j++, temp++) {
+
+                DatabaseReference branchyearRef = branchRef.child(temp + "");
+
+                branchyearRef.child("setter").setValue("BK SINGH");
+
+
+                char x = 'b', y = '1';
+
+                for (int i = 1; i <= 40; i++) {
+                    String sId = Character.toString(x) + "" + Character.toString(y);
+
+                    DatabaseReference branchyeartableBRef =branchyearRef.child("table").child(sId);
+
+                    DatabaseReference myref3 = branchyeartableBRef.child("subcode");
+                    myref3.setValue("1");
+                    myref3 = branchyeartableBRef.child("lecture");
+                    myref3.setValue(true);
+                    y++;
+                    if (y > '5') {
+                        y = '1';
+                        x++;
+                    }
                 }
-            }
 
-            for(long k=1;k<=10;k++)
-            {
-                DatabaseReference myRef3=myRef.child(temp+"").child("table").child("subjects").child("sub"+k+"");
-                DatabaseReference myRef4= myRef3.child("subcode");
-                myRef4.setValue("CS501");
-                myRef4=myRef3.child("teachername");
-                myRef4.setValue("Sanjay Kumar");
-                myRef4=myRef3.child("subjectname");
-                myRef4.setValue("Optimisation");
-            }
 
+                for (long k = 1; k <= 10; k++) {
+
+
+                    DatabaseReference branchyeartablesubjectRef  = branchyearRef.child("table").child("subjects").child("sub" + k + "");
+                    DatabaseReference myRef4 = branchyeartablesubjectRef.child("subcode");
+                    myRef4.setValue(branches[p]+"501");
+                    myRef4 = branchyeartablesubjectRef.child("teachername");
+                    myRef4.setValue("Sanjay Kumar");
+                    myRef4 = branchyeartablesubjectRef.child("subjectname");
+                    myRef4.setValue("Optimisation");
+                }
+
+            }
         }
 
 

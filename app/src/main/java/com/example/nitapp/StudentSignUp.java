@@ -164,6 +164,7 @@ public class StudentSignUp extends AppCompatActivity implements AdapterView.OnIt
                                             finish();
                                             Intent intent = new Intent(StudentSignUp.this, LoginActivity.class);
                                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                            intent.putExtra("role","student");
                                             startActivity(intent);
                                         }
                                     }
@@ -185,7 +186,9 @@ public class StudentSignUp extends AppCompatActivity implements AdapterView.OnIt
 
         }
 
-    } // end of professorSignUp
+    }
+
+    // end of professorSignUp
 
     public boolean checkValid() {
         username = textInputLayoutStudentName.getEditText().getText().toString().trim();

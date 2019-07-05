@@ -112,6 +112,7 @@ public class ProfessorSignUp extends AppCompatActivity implements AdapterView.On
                                     Toast.makeText(ProfessorSignUp.this, "User  Registration Successful", Toast.LENGTH_SHORT).show();
                                     finish();
                                     Intent intent = new Intent(ProfessorSignUp.this, LoginActivity.class);
+                                    intent.putExtra("role","professor");
                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                     startActivity(intent);
                                 }

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SubjectListActivity"
+    android:layout_alignParentBottom="true">
+    <TextView
+        android:id="@+id/subjectlistinfo"
+        android:text="CS 2016"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="40dp"
+        android:gravity="center"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true"
+        android:padding="40dp">
+
+    <Button
+        android:text="SUBJECT1"
+        android:id="@+id/sub1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="f"
+        />
+    <Button
+        android:id="@+id/sub2"
+        android:text="SUBJECT2"
+        android:onClick="f"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/sub3"
+        android:text="SUBJECT3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="f"/>
+    <Button
+        android:id="@+id/sub4"
+        android:text="SUBJECT4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="f"/>
+    <Button
+        android:id="@+id/sub5"
+        android:text="SUBJECT5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="f"/>
+    <Button
+        android:id="@+id/sub6"
+        android:text="SUBJECT6"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="f"/>
+    <Button
+        android:id="@+id/sub7"
+        android:text="SUBJECT7"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="f"/>
+    <Button
+        android:id="@+id/sub8"
+        android:text="SUBJECT8"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="f"/>
+    <Button
+        android:id="@+id/sub9"
+        android:text="SUBJECT9"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="f"/>
+
+    <Button
+        android:id="@+id/sub10"
+        android:text="SUBJECT10"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="f"/>
+
+        <Button
+            android:id="@+id/changesetterbutton"
+            android:onClick="changesetter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="CHANGE SETTER"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

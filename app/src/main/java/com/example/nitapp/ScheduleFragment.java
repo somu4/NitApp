@@ -3,6 +3,7 @@ package com.example.nitapp;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -24,11 +25,15 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -45,10 +50,14 @@ public class ScheduleFragment extends Fragment {
     public String RoomnoKey = "roomno";
     boolean access = false;
 
+    DatabaseReference yearRef,branchRef,scheduleRef,tableRef;
+
+    String yearString,branchString,uniqueid;
+
+
     Context context;
     MainActivity mainActivity;
 
-    DatabaseReference myRef;
 
     class Node {
         String teacher_name, subject_name, subject_code, room_no;
@@ -61,20 +70,27 @@ public class ScheduleFragment extends Fragment {
         }
     }
 
-    Node[] node;
+    Spinner spin_year;
+    Spinner spin_branch;
+    Spinner spin_subjectlist;
+
+    ProgressBar progressBar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
         View view = inflater.inflate(R.layout.fragment_schedule, container, false);
 
+
+        progressBar=view.findViewById(R.id.progressbar_dialog);
+
         context = getContext();
         mainActivity = (MainActivity) getActivity();
 
+        yearString=mainActivity.myYear.toUpperCase();
+        branchString=mainActivity.myBranch.toUpperCase();
+
         Toast.makeText(getContext(), mainActivity.myBranch + mainActivity.myYear + "!", Toast.LENGTH_SHORT).show();
-
-
-
-        Spinner spin_year = view.findViewById(R.id.spinner1);
+        spin_year = view.findViewById(R.id.spinnerScheduleYear);
         ArrayList<String> years = new ArrayList<String>();
         int thisYear = Calendar.getInstance().get(Calendar.YEAR);
         for (int i = thisYear; i >= thisYear - 4; i--) {
@@ -82,37 +98,77 @@ public class ScheduleFragment extends Fragment {
         }
 
         ArrayAdapter<String> adapter1 = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, years);
+
         adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spin_year.setAdapter(adapter1);
-        spin_year.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        spin_year.setScrollBarSize(100);
 
-            }
+        spin_branch = view.findViewById(R.id.spinnerScheduleBranch);
+        ArrayList<String> branchList = new ArrayList<String>();
+        String[] branchesArray={"CS","MM","ME","CE","EE","EC","PI"};
+        for(int i=0;i<7;i++)
+        {
+            branchList.add(branchesArray[i]);
+        }
+        ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, branchesArray);
+        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spin_branch.setAdapter(adapter2);
 
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
+        spin_subjectlist=view.findViewById(R.id.spinnerScheduleSubjectList);
+        ArrayList<String> subjectList=new ArrayList<>();
+        subjectList.add("----");
+        subjectList.add("SubjectList");
+        ArrayAdapter<String> adapter3 = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, subjectList);
+        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spin_subjectlist.setAdapter(adapter3);
 
-            }
-        });
+
 
         return view;
     }
 
-    public void fetchingButtonInfo(View view) {
+
+
+    public void fetchingButtonInfo() {
 
         char x = 'b', y = '1';
         for (int i = 1; i <= 40; i++) {
+
             final String sId = Character.toString(x) + "" + Character.toString(y);
             final int j = i;
 
+
+
+            progressBar.setVisibility(View.VISIBLE);
+            stopProgressBarVariable=78;
+
             DatabaseReference myRef2, myRef3;
-            myRef2 = FirebaseDatabase.getInstance().getReference("schedule").child((mainActivity.myBranch).toUpperCase()).child(mainActivity.myYear).child("table").child(sId).child("subcode");
-            myRef2.addValueEventListener(new ValueEventListener() {
+
+            myRef2 = tableRef.child(sId).child("subcode");
+            myRef2.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     String s = dataSnapshot.getValue(String.class);
-                    setButtonText(sId, s, getView());
+                    String subjpath="sub"+s+"";
+
+                    DatabaseReference x=tableRef.child("subjects").child(subjpath).child("subcode");
+
+                    x.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            String temp=dataSnapshot.getValue(String.class);
+                            setButtonText(sId, temp, getView());
+                            stopProgressBar();
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            progressBar.setVisibility(View.INVISIBLE);
+                            Toast.makeText(getContext(), "Failed to load ! ", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+
                 }
 
                 @Override
@@ -121,12 +177,13 @@ public class ScheduleFragment extends Fragment {
                 }
             });
 
-            myRef3 = FirebaseDatabase.getInstance().getReference("schedule").child((mainActivity.myBranch).toUpperCase()).child(mainActivity.myYear).child("table").child(sId).child("lecture");
-            myRef3.addValueEventListener(new ValueEventListener() {
+            myRef3 = tableRef.child(sId).child("lecture");
+            myRef3.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Boolean value = dataSnapshot.getValue(Boolean.class);
                     setButtonColor(sId, value, getView());
+                    stopProgressBar();
                 }
 
                 @Override
@@ -135,12 +192,27 @@ public class ScheduleFragment extends Fragment {
                 }
             });
 
+
             y++;
             if (y > '5') {
                 y = '1';
                 x++;
             }
         }
+    }
+
+    long stopProgressBarVariable;
+    synchronized private void stopProgressBar()
+    {
+        if(stopProgressBarVariable==0)
+        {
+            progressBar.setVisibility(View.INVISIBLE);
+        }
+        else
+        {
+            stopProgressBarVariable--;
+        }
+
     }
 
     private void setButtonText(String sId1, String data, View view) {
@@ -161,10 +233,6 @@ public class ScheduleFragment extends Fragment {
 
     private void setDialogBox(View view) {
 
-        node = new Node[41];
-        for (int i = 0; i < 41; i++)
-            node[i] = new Node();
-
         char x = 'b', y = '1';
         for (int i = 1; i <= 40; i++) {
             final String sId = Character.toString(x) + "" + Character.toString(y);
@@ -172,85 +240,15 @@ public class ScheduleFragment extends Fragment {
             if (id == 0) {
                 Toast.makeText(getContext(), sId + "NULL", Toast.LENGTH_SHORT).show();
             } else {
-                final int j = i;
-                node[i].teacher_name = "B.K.Singh";
-                node[i].subject_name = "OPERATING SYSTEMS";
-                node[i].room_no = "204";
 
                 Button button = view.findViewById(id);
-                button.setBackgroundColor(Color.GREEN);
 
                 ViewGroup.LayoutParams lp = button.getLayoutParams();
                 ((LinearLayout.LayoutParams) lp).setMargins(2, 0, 3, 0);
                 button.setOnClickListener(new View.OnClickListener() {
-                    int flag = 0;
-                    EditText subject_code_et, subject_name_et, teacher_name_et, room_no_et;
-                    Dialog teacher_dialog = new Dialog(getContext());
-                    TextView subject_code_dialog, subject_dialog, room_dialog;
-                    Dialog student_dialog = new Dialog(getContext());
-
                     @Override
                     public void onClick(View v) {
-                        if (access == true) {
-                            teacher_dialog.setContentView(R.layout.schedule_teacher_dialog);
-
-                            subject_code_et = teacher_dialog.getWindow().findViewById(R.id.edit_dialog_sub_code);
-                            subject_name_et = teacher_dialog.getWindow().findViewById(R.id.edit_dialog_sub_name);
-                            teacher_name_et = teacher_dialog.getWindow().findViewById(R.id.edit_dialog_teacher_name);
-                            room_no_et = teacher_dialog.getWindow().findViewById(R.id.edit_dialog_room_no);
-
-                            if (flag == 1) {
-                                SharedPreferences sp = getContext().getSharedPreferences(MYPREFERENCE, Context.MODE_PRIVATE);
-                                String subject_code_sp = sp.getString(SubcodeKey + sId, "");
-                                String subject_name_sp = sp.getString(SubnameKey + sId, "");
-                                String teacher_name_sp = sp.getString(TeachernameKey + sId, "");
-                                String room_no_sp = sp.getString(RoomnoKey + sId, "");
-                                subject_code_et.setText(subject_code_sp);
-                                subject_name_et.setText(subject_name_sp);
-                                teacher_name_et.setText(teacher_name_sp);
-                                room_no_et.setText(room_no_sp);
-                            }
-                            Button save_schedule_btn = teacher_dialog.getWindow().findViewById(R.id.button_save_schedule);
-                            save_schedule_btn.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    SharedPreferences sharedPref = getContext().getSharedPreferences(MYPREFERENCE, Context.MODE_PRIVATE);
-                                    SharedPreferences.Editor editor = sharedPref.edit();
-                                    editor.putString(SubcodeKey + sId, subject_code_et.getText().toString());
-                                    editor.putString(SubnameKey + sId, subject_name_et.getText().toString());
-                                    editor.putString(TeachernameKey + sId, teacher_name_et.getText().toString());
-                                    editor.putString(RoomnoKey + sId, room_no_et.getText().toString());
-                                    editor.apply();
-                                    flag = 1;
-                                    Toast.makeText(getContext(), "saved", Toast.LENGTH_SHORT).show();
-                                    teacher_dialog.dismiss();
-                                }
-                            });
-                            teacher_dialog.setCanceledOnTouchOutside(true);
-                            teacher_dialog.show();
-                        } else {
-                            student_dialog.setContentView(R.layout.schedule_student_dialog);
-                            Button teacher_info;
-                            teacher_info = student_dialog.getWindow().findViewById(R.id.dialog_teacher);
-                            subject_code_dialog = student_dialog.getWindow().findViewById(R.id.dialog_subject_code);
-                            subject_dialog = student_dialog.getWindow().findViewById(R.id.dialog_subject);
-                            room_dialog = student_dialog.getWindow().findViewById(R.id.dialog_room);
-                            subject_code_dialog.setText(node[j].subject_code);
-                            subject_dialog.setText(node[j].subject_name);
-                            teacher_info.setText(node[j].teacher_name);
-                            room_dialog.setText(node[j].room_no);
-
-                            SharedPreferences sp1 = getContext().getSharedPreferences(MYPREFERENCE, Context.MODE_PRIVATE);
-                            SharedPreferences.Editor editor = sp1.edit();
-                            editor.putString(SubcodeKey + sId, node[j].subject_code);
-                            editor.putString(SubnameKey + sId, node[j].subject_name);
-                            editor.putString(TeachernameKey + sId, node[j].teacher_name);
-                            editor.putString(RoomnoKey + sId, node[j].room_no);
-                            editor.apply();
-
-                            student_dialog.setCanceledOnTouchOutside(true);
-                            student_dialog.show();
-                        }
+                        showDialogBox(v);
                     }
                 });
             }
@@ -263,11 +261,237 @@ public class ScheduleFragment extends Fragment {
         }
     }
 
+
+
+    private void changeSubjectInDialog(Dialog dialog) {
+            final String email=FirebaseAuth.getInstance().getCurrentUser().getEmail().trim();
+
+        final ProgressBar progressBar1=dialog.getWindow().findViewById(R.id.dialog_schedule_progressbar);
+
+        progressBar1.setVisibility(View.VISIBLE);
+
+            DatabaseReference setterRef=yearRef.child("setter");
+            setterRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    String s=dataSnapshot.getValue(String.class);
+                    if(s.equals(email))
+                    {
+                        Toast.makeText(getContext(), "You are a setter ! ", Toast.LENGTH_SHORT).show();
+                    }
+                    else
+                    {
+                        Toast.makeText(getContext(), "You are not a setter ! ", Toast.LENGTH_SHORT).show();
+
+                    }
+
+                    progressBar1.setVisibility(View.INVISIBLE);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+    }
+
+
+    public void showDialogBox(View view)
+    {
+        final Dialog dialog=new Dialog(getContext());
+        dialog.setContentView(R.layout.schedule_student_dialog);
+        dialog.setCanceledOnTouchOutside(true);
+
+        final TextView subjectCodeTextView =dialog.getWindow().findViewById(R.id.dialog_subject_code);
+        final TextView subjectNameTextView=dialog.getWindow().findViewById(R.id.dialog_subject_name);
+        final Button teachernameButton=dialog.getWindow().findViewById(R.id.dialog_teacher);
+        final Button changeSubjectButton=dialog.getWindow().findViewById(R.id.schedule_dialog_change_subject_button);
+        changeSubjectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeSubjectInDialog(dialog);
+            }
+        });
+
+        String id=view.getResources().getResourceName(view.getId());
+        String id1="";
+
+        for(int i=0;i<id.length();i++)
+        {
+            if(id.charAt(i)=='/')
+            {
+                for(int j=i+1;j<id.length();j++)
+                {
+                    id1+=id.charAt(j);
+                }
+                break;
+            }
+        }
+
+        //Toast.makeText(getContext(), id1, Toast.LENGTH_SHORT).show();
+
+        DatabaseReference subnumberRef=tableRef.child(id1).child("subcode");
+
+        final ProgressBar progressBar1=dialog.getWindow().findViewById(R.id.dialog_schedule_progressbar);
+
+        progressBar1.setVisibility(View.VISIBLE);
+
+        Toast.makeText(getContext(), "Setting visibility", Toast.LENGTH_SHORT).show();
+
+        subnumberRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String s=dataSnapshot.getValue(String.class);
+
+                DatabaseReference subjectRef=tableRef.child("subjects").child("sub"+s);
+
+                DatabaseReference subcodeRef=subjectRef.child("subcode");
+                subcodeRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        String s=dataSnapshot.getValue(String.class);
+                        subjectCodeTextView.setText(s);
+                        progressBar1.setVisibility(View.INVISIBLE);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+                DatabaseReference subjectnameRef=subjectRef.child("subjectname");
+                subjectnameRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        String s=dataSnapshot.getValue(String.class);
+                        subjectNameTextView.setText(s);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+                DatabaseReference teacherRef =subjectRef.child("teachername");
+                teacherRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        String s=dataSnapshot.getValue(String.class);
+                        teachernameButton.setText(s);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        dialog.show();
+    }
+
+
+
+
+    //private method of your class
+    private int getIndex(Spinner spinner, String myString){
+        for (int i=0;i<spinner.getCount();i++){
+            if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(myString)){
+                return i;
+            }
+        }
+
+        return 0;
+    }
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setDialogBox(getView());
-        fetchingButtonInfo(getView());
+
+        scheduleRef=FirebaseDatabase.getInstance().getReference("schedule");
+
+
+
+        spin_year.setSelection(getIndex(spin_year, yearString));
+        //fetchingButtonInfo();
+        spin_year.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                yearString=spin_year.getSelectedItem().toString().trim();
+                tableRef=scheduleRef.child(branchString).child(yearString).child("table");
+                yearRef=scheduleRef.child(branchString).child(yearString);
+                Toast.makeText(getContext(), yearString, Toast.LENGTH_SHORT).show();
+                fetchingButtonInfo();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+
+        spin_branch.setSelection(getIndex(spin_branch, branchString));
+
+        spin_branch.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                branchString=spin_branch.getSelectedItem().toString().trim();
+                tableRef=scheduleRef.child(branchString).child(yearString).child("table");
+                branchRef=scheduleRef.child(branchString);
+                fetchingButtonInfo();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        spin_subjectlist.setSelection(getIndex(spin_subjectlist,"----"));
+
+        spin_subjectlist.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String s=spin_subjectlist.getSelectedItem().toString().trim();
+                if(s.equals("SubjectList"))
+                {
+                    Toast.makeText(getContext(), "HOOOO!", Toast.LENGTH_SHORT).show();
+
+                    Intent intent=new Intent(getActivity(),SubjectListActivity.class);
+                    intent.putExtra("branch",branchString);
+                    intent.putExtra("year",yearString);
+
+                    uniqueid=FirebaseAuth.getInstance().getCurrentUser().getUid();
+                    intent.putExtra("uniqueid",uniqueid );
+
+                    startActivityForResult(intent,99);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        spin_subjectlist.setSelection(getIndex(spin_subjectlist,"----"));
+        Toast.makeText(getContext(), "wOOOO!", Toast.LENGTH_SHORT).show();
+    }
 }
