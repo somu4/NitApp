@@ -37,6 +37,8 @@ public class StudentSignUp extends AppCompatActivity implements AdapterView.OnIt
     private FirebaseAuth mAuth;
     private FirebaseDatabase database;
     private DatabaseReference myRef;
+    private UserLocalStore userLocalStore;
+
 
     private TextInputLayout textInputLayoutStudentName, textInputLayoutStudentEmail, textInputLayoutStudentContactNo, textInputLayoutStudentPassword;
     private Spinner spinnerBranch, spinnerYear, spinnerRollNo, spinnerHostel;
@@ -62,6 +64,8 @@ public class StudentSignUp extends AppCompatActivity implements AdapterView.OnIt
 
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
+        userLocalStore= new UserLocalStore(getApplicationContext());
+
 
 
         textInputLayoutStudentName = findViewById(R.id.text_input_layout_student_name);
@@ -146,7 +150,7 @@ public class StudentSignUp extends AppCompatActivity implements AdapterView.OnIt
 
                             if (task.isSuccessful()) {
 
-                                StudentDataClass studentDataClass = new StudentDataClass(username, email, contactNumber,
+                                final StudentDataClass studentDataClass = new StudentDataClass(username, email, contactNumber,
                                         rollNumber,branch,  year, hostel, roomNumber, gender);
 
                                 myRef = database.getReference("student").child(branchCode).child(year + "");
@@ -160,6 +164,7 @@ public class StudentSignUp extends AppCompatActivity implements AdapterView.OnIt
                                     public void onComplete(@NonNull Task<Void> task) {
                                         progressBarStudentActivity.setVisibility(View.GONE);
                                         if (task.isSuccessful()) {
+                                            userLocalStore.storeStudentData(studentDataClass);
                                             Toast.makeText(StudentSignUp.this, "User  Registration Successful", Toast.LENGTH_SHORT).show();
                                             finish();
                                             Intent intent = new Intent(StudentSignUp.this, LoginActivity.class);

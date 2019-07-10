@@ -8,17 +8,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 
 public class MedicalFragment extends Fragment implements View.OnClickListener {
     private RelativeLayout calldoctorButton;
     private RelativeLayout callambulanceButton, nearbyHospitalsView;
+    private UserLocalStore userLocalStore;
+
+
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
         View view = inflater.inflate(R.layout.fragment_medical, container, false);
+        userLocalStore= new UserLocalStore(getContext());
+
 
         calldoctorButton = view.findViewById(R.id.call_doctor_view);
         callambulanceButton = view.findViewById(R.id.call_ambulance_view);
@@ -59,6 +65,7 @@ public class MedicalFragment extends Fragment implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.nearby_hospitals_view:
                 FirebaseAuth.getInstance().signOut();
+                userLocalStore.clearUserData();
                 Intent intent = new Intent(getActivity(), LoginActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);

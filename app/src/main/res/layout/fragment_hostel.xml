@@ -8,9 +8,45 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="10dp"
         android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:background="#1DE9B6">
+            <TextView
+                android:id="@+id/textview_hostel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="My Hostel :"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorWhite"/>
+            <TextView
+                android:id="@+id/textview_room_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="My Room No. :"
+                android:textStyle="bold"
+                android:layout_below="@+id/textview_hostel"
+                android:textSize="20sp"
+                android:textColor="@color/colorWhite"/>
+            <Button
+                android:id="@+id/button_my_complaints"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" My Complaints "
+
+                android:textColor="@color/colorWhite"
+                android:background="@color/colorPrimary"
+                android:layout_alignParentEnd="true"/>
+
+        </RelativeLayout>
+
+
         <TextView
+            android:layout_marginTop="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Complaint Type"
@@ -23,28 +59,22 @@
             android:layout_height="wrap_content">
         </Spinner>
 
-        <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text=" Description:"-->
-            <!--android:textSize="20sp"/>-->
+
 
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/shipper_layout"
+            android:layout_margin="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:background="@drawable/custom_text_input_layout_shape"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            >
 
-            <EditText
+            <android.support.design.widget.TextInputEditText
                 android:id="@+id/edittext_complaint_description"
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
-
+                android:layout_height="wrap_content"
                 android:gravity="top"
                 android:hint="DESCRIPTION"
                 android:inputType="textMultiLine"
@@ -67,6 +97,16 @@
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
             android:textSize="22sp" />
+        <!--<ListView-->
+            <!--android:id="@+id/listview_mycomplaints"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--/>-->
+
+
+
+
+
     </LinearLayout>
 
 

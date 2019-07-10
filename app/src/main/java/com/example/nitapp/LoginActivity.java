@@ -26,17 +26,27 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
-    private FirebaseAuth mAuth;
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private TextInputLayout rollET, passwordET;
     private int tim = 0;
     private ProgressBar progressBarLoginActivity;
+    private UserLocalStore userLocalStore;
+    private FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private DatabaseReference myRef;
+
+    String roll_emp;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        mAuth = FirebaseAuth.getInstance();
+
+        userLocalStore= new UserLocalStore(this);
+
+
         rollET = findViewById(R.id.roll_login);
         passwordET = findViewById(R.id.password_login);
         progressBarLoginActivity = findViewById(R.id.progressbar_login_activity);
@@ -44,11 +54,12 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        if (tim == 0) {
-            Intent splashIntent = new Intent(this, SplashScreen.class);
-            startActivity(splashIntent);
-            tim = 1;
-        }
+//        if (tim == 0) {
+//            Intent splashIntent = new Intent(this, SplashScreen.class);
+//            startActivity(splashIntent);
+//            tim = 1;
+//        }
+
         super.onResume();
     }
 
@@ -64,6 +75,23 @@ public class LoginActivity extends AppCompatActivity {
         if (firebaseUser != null) {
             String email = firebaseUser.getEmail();
             if(email.charAt(4)=='U'||email.charAt(4)=='u'){
+                roll_emp = email.substring(0,11);
+                myRef=database.getReference("student").child(roll_emp.substring(6,8).toUpperCase())
+                        .child(roll_emp.substring(0,4)).child(mAuth.getUid());
+
+
+                myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot2) {
+                        StudentDataClass studentDataClass = dataSnapshot2.getValue(StudentDataClass.class);
+                        userLocalStore.storeStudentData(studentDataClass);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                    }
+                });
+
                 finish();
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
@@ -104,8 +132,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void login(View view) {
-        String roll = rollET.getEditText().getText().toString();
-        String password = passwordET.getEditText().getText().toString();
+        final String roll = rollET.getEditText().getText().toString();
+        roll_emp =roll;
+        final String password = passwordET.getEditText().getText().toString();
 
         if (roll.isEmpty()) {
             Toast.makeText(this, "Roll-no is not Entered !!", Toast.LENGTH_SHORT).show();
@@ -119,6 +148,7 @@ public class LoginActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             progressBarLoginActivity.setVisibility(View.GONE);
                             if (task.isSuccessful()) {
+
                                 FirebaseUser user = mAuth.getCurrentUser();
                                 updateUI(user);
                             } else {
