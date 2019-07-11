@@ -87,7 +87,7 @@ public class ProfessorSignUp extends AppCompatActivity implements AdapterView.On
             /*  Do User Registration Here. */
             progressBarProfessorSignUp.setVisibility(View.VISIBLE);
 
-            String userName = professorEmployeeID + "@p.com";
+            final String userName = professorEmployeeID + "@p.com";
             mAuth.createUserWithEmailAndPassword( userName, professorPassword)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
@@ -118,6 +118,18 @@ public class ProfessorSignUp extends AppCompatActivity implements AdapterView.On
                                 }
                             }
                         });
+
+                        Toast.makeText(ProfessorSignUp.this, "Inserted"+userName, Toast.LENGTH_SHORT).show();
+
+                        String user="";
+                        for(int i=0;i<userName.length();i++)
+                        {
+                            if(userName.charAt(i)=='@')
+                                break;
+                            user+=userName.charAt(i);
+                        }
+                        DatabaseReference professorNameRef=FirebaseDatabase.getInstance().getReference("professorname").child(user);
+                        professorNameRef.setValue(professorName);
 
 
                     } else {

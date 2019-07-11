@@ -52,7 +52,7 @@ public class ScheduleFragment extends Fragment {
     public String RoomnoKey = "roomno";
     boolean access = false;
 
-    DatabaseReference yearRef,branchRef,scheduleRef,tableRef,subnumberRef;
+    DatabaseReference yearRef,branchRef,scheduleRef,tableRef,subnumberRef,lectureRef;
 
     String yearString,branchString,uniqueid;
 
@@ -93,6 +93,7 @@ public class ScheduleFragment extends Fragment {
 
         Toast.makeText(getContext(), mainActivity.myBranch + mainActivity.myYear + "!", Toast.LENGTH_SHORT).show();
         spin_year = view.findViewById(R.id.spinnerScheduleYear);
+
         ArrayList<String> years = new ArrayList<String>();
         int thisYear = Calendar.getInstance().get(Calendar.YEAR);
         for (int i = thisYear; i >= thisYear - 4; i--) {
@@ -101,8 +102,10 @@ public class ScheduleFragment extends Fragment {
 
         ArrayAdapter<String> adapter1 = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, years);
 
-        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spin_year.setAdapter(adapter1);
+
+        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
         spin_year.setScrollBarSize(100);
 
         spin_branch = view.findViewById(R.id.spinnerScheduleBranch);
@@ -124,7 +127,72 @@ public class ScheduleFragment extends Fragment {
         adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spin_subjectlist.setAdapter(adapter3);
 
+        scheduleRef=FirebaseDatabase.getInstance().getReference("schedule");
 
+
+        spin_year.setSelection(getIndex(spin_year, yearString));
+        //fetchingButtonInfo();
+        spin_year.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                yearString=spin_year.getSelectedItem().toString().trim();
+                tableRef=scheduleRef.child(branchString).child(yearString).child("table");
+                yearRef=scheduleRef.child(branchString).child(yearString);
+                Toast.makeText(getContext(), yearString+"*"+branchString, Toast.LENGTH_SHORT).show();
+                fetchingButtonInfo();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+
+        spin_branch.setSelection(getIndex(spin_branch, branchString));
+
+        spin_branch.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                Toast.makeText(getContext(), "CLICKED2", Toast.LENGTH_SHORT).show();
+                branchString=spin_branch.getSelectedItem().toString().trim();
+                tableRef=scheduleRef.child(branchString).child(yearString).child("table");
+                branchRef=scheduleRef.child(branchString);
+                fetchingButtonInfo();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        spin_subjectlist.setSelection(getIndex(spin_subjectlist,"----"));
+
+        spin_subjectlist.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String s=spin_subjectlist.getSelectedItem().toString().trim();
+                if(s.equals("SubjectList"))
+                {
+                    Toast.makeText(getContext(), "HOOOO!", Toast.LENGTH_SHORT).show();
+
+                    Intent intent=new Intent(getActivity(),SubjectListActivity.class);
+                    intent.putExtra("branch",branchString);
+                    intent.putExtra("year",yearString);
+
+                    uniqueid=FirebaseAuth.getInstance().getCurrentUser().getUid();
+                    intent.putExtra("uniqueid",uniqueid );
+
+                    startActivityForResult(intent,99);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
         return view;
     }
@@ -274,13 +342,17 @@ public class ScheduleFragment extends Fragment {
 
 
     private void changeSubjectInDialog(final Dialog dialog, final View view) {
+
             final String email=FirebaseAuth.getInstance().getCurrentUser().getEmail().trim();
 
         final ProgressBar progressBar1=dialog.getWindow().findViewById(R.id.dialog_schedule_progressbar);
 
         progressBar1.setVisibility(View.VISIBLE);
 
-            DatabaseReference setterRef=yearRef.child("setter");
+        Toast.makeText(getContext(), branchString+yearString, Toast.LENGTH_SHORT).show();
+
+            DatabaseReference setterRef=FirebaseDatabase.getInstance().getReference("schedule").child(branchString).child(yearString).child("setter");
+
             setterRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -289,7 +361,7 @@ public class ScheduleFragment extends Fragment {
                     {
                         Toast.makeText(getContext(), "You are a setter ! ", Toast.LENGTH_SHORT).show();
 
-                        Dialog dialog1=new Dialog(getContext());
+                        final Dialog dialog1=new Dialog(getContext());
                         dialog1.setContentView(R.layout.change_subject_dialog);
                         dialog1.setCanceledOnTouchOutside(true);
 
@@ -330,16 +402,21 @@ public class ScheduleFragment extends Fragment {
 
                                 }
                             });
-
                         }
+                        Button button=dialog1.getWindow().findViewById(R.id.changesubjectcancel);
+                        button.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                dialog1.cancel();
+                            }
+                        });
 
                         dialog1.show();
 
                     }
                     else
                     {
-                        Toast.makeText(getContext(), "You are not a setter ! ", Toast.LENGTH_SHORT).show();
-
+                        Toast.makeText(getContext(), s+"You are not a setter ! "+email, Toast.LENGTH_SHORT).show();
                     }
 
                     progressBar1.setVisibility(View.INVISIBLE);
@@ -372,7 +449,7 @@ public class ScheduleFragment extends Fragment {
         final TextView subjectNameTextView=dialog.getWindow().findViewById(R.id.dialog_subject_name);
         final Button teachernameButton=dialog.getWindow().findViewById(R.id.dialog_teacher);
         final Button changeSubjectButton=dialog.getWindow().findViewById(R.id.schedule_dialog_change_subject_button);
-        final Switch s=dialog.getWindow().findViewById(R.id.schedule_dialog_cancel_switch);
+        final Switch aSwitch=dialog.getWindow().findViewById(R.id.schedule_dialog_cancel_switch);
 
 
         changeSubjectButton.setOnClickListener(new View.OnClickListener() {
@@ -382,7 +459,7 @@ public class ScheduleFragment extends Fragment {
             }
         });
 
-        s.setOnClickListener(new View.OnClickListener() {
+        aSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Switch s=(Switch)view;
@@ -395,12 +472,17 @@ public class ScheduleFragment extends Fragment {
                     Toast.makeText(getContext(), "Boi2", Toast.LENGTH_SHORT).show();
                 }
 
-                String email=FirebaseAuth.getInstance().getCurrentUser().getEmail().trim();
+                aSwitch.setClickable(false);
+
+                final ProgressBar progressBar1=dialog.getWindow().findViewById(R.id.dialog_schedule_progressbar);
+                progressBar1.setVisibility(View.VISIBLE);
+
+                final String email=FirebaseAuth.getInstance().getCurrentUser().getEmail().trim();
                 subnumberRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         String s=dataSnapshot.getValue(String.class);
-                        DatabaseReference teacherRef=tableRef.child("subjects").child("sub"+1).child("teacherid");
+                        DatabaseReference teacherRef=tableRef.child("subjects").child("sub"+s).child("teacherid");
                         teacherRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -412,28 +494,50 @@ public class ScheduleFragment extends Fragment {
                                 }
                                 else
                                 {
+                                    Toast.makeText(getContext(), "Not null string!"+temp, Toast.LENGTH_SHORT).show();
 
+                                    if(temp.equals(email))
+                                    {
+                                        if(!aSwitch.isChecked())
+                                            lectureRef.setValue(false);
+                                        else
+                                            lectureRef.setValue(true);
+                                    }
+                                    else
+                                    {
+                                        Toast.makeText(getContext(), "You are not a teacher !", Toast.LENGTH_SHORT).show();
+                                        if(aSwitch.isChecked())
+                                            aSwitch.setChecked(false);
+                                        else
+                                            aSwitch.setChecked(true);
+                                    }
                                 }
-
+                                progressBar1.setVisibility(View.INVISIBLE);
+                                aSwitch.setClickable(true);
                             }
 
                             @Override
                             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                                progressBar1.setVisibility(View.INVISIBLE);
+                                aSwitch.setClickable(true);
+                                if(aSwitch.isChecked())
+                                    aSwitch.setChecked(false);
+                                else
+                                    aSwitch.setChecked(true);
                             }
                         });
                     }
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                        progressBar1.setVisibility(View.INVISIBLE);
+                        aSwitch.setClickable(true);
                     }
                 });
 
 
             }
         });
-        s.setTextOff("OFF");
-        s.setTextOn("ONN");
+
 
         String id=view.getResources().getResourceName(view.getId());
         String id1="";
@@ -453,10 +557,27 @@ public class ScheduleFragment extends Fragment {
         //Toast.makeText(getContext(), id1, Toast.LENGTH_SHORT).show();
 
         subnumberRef=tableRef.child(id1).child("subcode");
+        lectureRef=tableRef.child(id1).child("lecture");
 
         final ProgressBar progressBar1=dialog.getWindow().findViewById(R.id.dialog_schedule_progressbar);
 
         progressBar1.setVisibility(View.VISIBLE);
+
+        lectureRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                boolean res=dataSnapshot.getValue(Boolean.class);
+                if(res==true)
+                    aSwitch.setChecked(true);
+                else
+                    aSwitch.setChecked(false);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         Toast.makeText(getContext(), "Setting visibility", Toast.LENGTH_SHORT).show();
 
@@ -496,12 +617,38 @@ public class ScheduleFragment extends Fragment {
                     }
                 });
 
-                DatabaseReference teacherRef =subjectRef.child("teachername");
+                DatabaseReference teacherRef =subjectRef.child("teacherid");
                 teacherRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         String s=dataSnapshot.getValue(String.class);
-                        teachernameButton.setText(s);
+                        String temp="";
+
+                        for(int i=0;i<s.length();i++)
+                        {
+                            if(s.charAt(i)=='@')
+                                break;
+                            temp+=s.charAt(i);
+                        }
+
+                        DatabaseReference databaseReference=FirebaseDatabase.getInstance().getReference("professorname").child(temp);
+
+                        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                String temp1=dataSnapshot.getValue(String.class);
+                                if(temp1!=null)
+                                {
+                                    teachernameButton.setText(temp1);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+
                     }
 
                     @Override
@@ -518,6 +665,8 @@ public class ScheduleFragment extends Fragment {
 
             }
         });
+
+
 
         dialog.show();
     }
@@ -540,73 +689,6 @@ public class ScheduleFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setDialogBox(getView());
-
-        scheduleRef=FirebaseDatabase.getInstance().getReference("schedule");
-
-
-
-        spin_year.setSelection(getIndex(spin_year, yearString));
-        //fetchingButtonInfo();
-        spin_year.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                yearString=spin_year.getSelectedItem().toString().trim();
-                tableRef=scheduleRef.child(branchString).child(yearString).child("table");
-                yearRef=scheduleRef.child(branchString).child(yearString);
-                Toast.makeText(getContext(), yearString, Toast.LENGTH_SHORT).show();
-                fetchingButtonInfo();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
-
-        spin_branch.setSelection(getIndex(spin_branch, branchString));
-
-        spin_branch.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                branchString=spin_branch.getSelectedItem().toString().trim();
-                tableRef=scheduleRef.child(branchString).child(yearString).child("table");
-                branchRef=scheduleRef.child(branchString);
-                fetchingButtonInfo();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
-        spin_subjectlist.setSelection(getIndex(spin_subjectlist,"----"));
-
-        spin_subjectlist.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                String s=spin_subjectlist.getSelectedItem().toString().trim();
-                if(s.equals("SubjectList"))
-                {
-                    Toast.makeText(getContext(), "HOOOO!", Toast.LENGTH_SHORT).show();
-
-                    Intent intent=new Intent(getActivity(),SubjectListActivity.class);
-                    intent.putExtra("branch",branchString);
-                    intent.putExtra("year",yearString);
-
-                    uniqueid=FirebaseAuth.getInstance().getCurrentUser().getUid();
-                    intent.putExtra("uniqueid",uniqueid );
-
-                    startActivityForResult(intent,99);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
     }
 
     @Override

@@ -73,6 +73,10 @@ public class SubjectListActivity extends AppCompatActivity {
                 if(s.equals(useremail))
                 {
                     Toast.makeText(SubjectListActivity.this, "You are hod! ", Toast.LENGTH_SHORT).show();
+                    Intent intent=new Intent(SubjectListActivity.this,ChangeSetterActivity.class);
+                    intent.putExtra("branch",branch);
+                    intent.putExtra("year",year);
+                    startActivity(intent);
                 }
                 else
                 {

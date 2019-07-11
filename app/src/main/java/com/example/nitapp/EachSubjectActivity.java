@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -16,13 +17,13 @@ import com.google.firebase.database.ValueEventListener;
 
 public class EachSubjectActivity extends AppCompatActivity {
 
-    EditText subjectname, subjectcode, subjectteacher;
+    EditText subjectname, subjectcode, subjectteacher,subjectteacherid;
 
 
     String branch, year, subid, uniqueid;
 
     DatabaseReference subjectListRef, setterRef;
-    DatabaseReference subjectcodeRef, subjectnameRef, teachernameRef;
+    DatabaseReference subjectcodeRef, subjectnameRef, teachernameRef,teacheridRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +32,9 @@ public class EachSubjectActivity extends AppCompatActivity {
         subjectcode = findViewById(R.id.eachsubjectcode);
         subjectname = findViewById(R.id.eachsubjectsubjectname);
         subjectteacher = findViewById(R.id.eachsubjectteachername);
+        subjectteacherid=findViewById(R.id.eachsubjectteacherid);
 
+        subjectteacher.setClickable(false);
 
         branch = getIntent().getStringExtra("branch");
         year = getIntent().getStringExtra("year");
@@ -84,6 +87,33 @@ public class EachSubjectActivity extends AppCompatActivity {
             }
         });
 
+        teacheridRef=subjectListRef.child(subid).child("teacherid");
+
+
+        teacheridRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String s=dataSnapshot.getValue(String.class);
+                i(s);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void i(String s) {
+        String t="";
+        for(int i=0;i<s.length();i++)
+        {
+            if(s.charAt(i)=='@')
+                break;
+            t+=s.charAt(i);
+        }
+        subjectteacherid.setText(t);
     }
 
     private void f(String s) {
@@ -180,6 +210,58 @@ public class EachSubjectActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
+            }
+        });
+    }
+
+    public void changesubjectteacherid(View view) {
+
+        final String temp=subjectteacherid.getText().toString().trim()+"@p.com";
+
+        final String temp1=subjectteacherid.getText().toString().trim();
+
+        final ProgressBar progressBar=findViewById(R.id.eachprogbar);
+        progressBar.setVisibility(View.VISIBLE);
+
+        final String uid = FirebaseAuth.getInstance().getCurrentUser().getEmail().trim();
+        setterRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String s = dataSnapshot.getValue(String.class);
+
+                if (s.equals(uid)) {
+
+                    DatabaseReference databaseReference=FirebaseDatabase.getInstance().getReference("professorname").child(temp1);
+                    databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            String x=dataSnapshot.getValue(String.class);
+                            if(x!=null)
+                            {
+                                teacheridRef.setValue(temp);
+                                teachernameRef.setValue(x);
+                                subjectteacher.setText(x);
+                            }
+                            else
+                            {
+                                Toast.makeText(EachSubjectActivity.this, "NO SUCH TEACHER", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                } else {
+                    Toast.makeText(EachSubjectActivity.this, "You are not a setter ! "+s, Toast.LENGTH_SHORT).show();
+                }
+                progressBar.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                progressBar.setVisibility(View.INVISIBLE);
             }
         });
     }
