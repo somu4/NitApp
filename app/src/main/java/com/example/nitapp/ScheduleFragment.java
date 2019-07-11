@@ -3,6 +3,7 @@ package com.example.nitapp;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -22,6 +23,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,7 +52,7 @@ public class ScheduleFragment extends Fragment {
     public String RoomnoKey = "roomno";
     boolean access = false;
 
-    DatabaseReference yearRef,branchRef,scheduleRef,tableRef;
+    DatabaseReference yearRef,branchRef,scheduleRef,tableRef,subnumberRef;
 
     String yearString,branchString,uniqueid;
 
@@ -216,6 +218,8 @@ public class ScheduleFragment extends Fragment {
     }
 
     private void setButtonText(String sId1, String data, View view) {
+        if(getActivity()==null)
+            return;
         int id1 = getResources().getIdentifier(sId1, "id", getActivity().getPackageName());
         Button button1 = view.findViewById(id1);
         button1.setText(data);
@@ -223,6 +227,8 @@ public class ScheduleFragment extends Fragment {
 
 
     private void setButtonColor(String sId1, boolean b, View view) {
+        if(getActivity()==null)
+            return;
         int id1 = getResources().getIdentifier(sId1, "id", getActivity().getPackageName());
         Button button1 = view.findViewById(id1);
         if (b == true)
@@ -236,6 +242,10 @@ public class ScheduleFragment extends Fragment {
         char x = 'b', y = '1';
         for (int i = 1; i <= 40; i++) {
             final String sId = Character.toString(x) + "" + Character.toString(y);
+
+            if(getActivity()==null)
+                return;
+
             int id = getResources().getIdentifier(sId, "id", getActivity().getPackageName());
             if (id == 0) {
                 Toast.makeText(getContext(), sId + "NULL", Toast.LENGTH_SHORT).show();
@@ -263,7 +273,7 @@ public class ScheduleFragment extends Fragment {
 
 
 
-    private void changeSubjectInDialog(Dialog dialog) {
+    private void changeSubjectInDialog(final Dialog dialog, final View view) {
             final String email=FirebaseAuth.getInstance().getCurrentUser().getEmail().trim();
 
         final ProgressBar progressBar1=dialog.getWindow().findViewById(R.id.dialog_schedule_progressbar);
@@ -278,6 +288,53 @@ public class ScheduleFragment extends Fragment {
                     if(s.equals(email))
                     {
                         Toast.makeText(getContext(), "You are a setter ! ", Toast.LENGTH_SHORT).show();
+
+                        Dialog dialog1=new Dialog(getContext());
+                        dialog1.setContentView(R.layout.change_subject_dialog);
+                        dialog1.setCanceledOnTouchOutside(true);
+
+                        for(int i=1;i<=10;i++)
+                        {
+                            String sub="subject"+i+"";
+
+                            if(getActivity()==null)
+                                return;
+                            int id=getResources().getIdentifier(sub,"id",getContext().getPackageName());
+
+                            dialog1.findViewById(id).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+
+                                    String subid=view.getResources().getResourceName(view.getId());
+
+                                    String id1="";
+
+                                    for(int i=0;i<subid.length();i++)
+                                    {
+                                        if(subid.charAt(i)=='/')
+                                        {
+                                            for(int j=i+8;j<subid.length();j++)
+                                            {
+                                                id1+=subid.charAt(j);
+                                            }
+                                            break;
+                                        }
+                                    }
+
+
+
+                                    Toast.makeText(getContext(), "HO Gya!"+id1, Toast.LENGTH_SHORT).show();
+
+
+                                    subnumberRef.setValue(id1);
+
+                                }
+                            });
+
+                        }
+
+                        dialog1.show();
+
                     }
                     else
                     {
@@ -303,16 +360,80 @@ public class ScheduleFragment extends Fragment {
         dialog.setContentView(R.layout.schedule_student_dialog);
         dialog.setCanceledOnTouchOutside(true);
 
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                fetchingButtonInfo();
+            }
+        });
+
+        final View view1=view;//to send to change Subject In dialog
         final TextView subjectCodeTextView =dialog.getWindow().findViewById(R.id.dialog_subject_code);
         final TextView subjectNameTextView=dialog.getWindow().findViewById(R.id.dialog_subject_name);
         final Button teachernameButton=dialog.getWindow().findViewById(R.id.dialog_teacher);
         final Button changeSubjectButton=dialog.getWindow().findViewById(R.id.schedule_dialog_change_subject_button);
+        final Switch s=dialog.getWindow().findViewById(R.id.schedule_dialog_cancel_switch);
+
+
         changeSubjectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                changeSubjectInDialog(dialog);
+                changeSubjectInDialog(dialog,view1);
             }
         });
+
+        s.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Switch s=(Switch)view;
+                if(s.isChecked())
+                {
+                    Toast.makeText(getContext(), "boi1", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    Toast.makeText(getContext(), "Boi2", Toast.LENGTH_SHORT).show();
+                }
+
+                String email=FirebaseAuth.getInstance().getCurrentUser().getEmail().trim();
+                subnumberRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        String s=dataSnapshot.getValue(String.class);
+                        DatabaseReference teacherRef=tableRef.child("subjects").child("sub"+1).child("teacherid");
+                        teacherRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                String temp=dataSnapshot.getValue(String.class);
+
+                                if(temp==null)
+                                {
+                                    Toast.makeText(getContext(), "Null string in switch", Toast.LENGTH_SHORT).show();
+                                }
+                                else
+                                {
+
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+
+            }
+        });
+        s.setTextOff("OFF");
+        s.setTextOn("ONN");
 
         String id=view.getResources().getResourceName(view.getId());
         String id1="";
@@ -331,7 +452,7 @@ public class ScheduleFragment extends Fragment {
 
         //Toast.makeText(getContext(), id1, Toast.LENGTH_SHORT).show();
 
-        DatabaseReference subnumberRef=tableRef.child(id1).child("subcode");
+        subnumberRef=tableRef.child(id1).child("subcode");
 
         final ProgressBar progressBar1=dialog.getWindow().findViewById(R.id.dialog_schedule_progressbar);
 

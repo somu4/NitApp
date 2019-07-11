@@ -123,8 +123,6 @@ public class MainActivity extends AppCompatActivity {
 
 
                 for (long k = 1; k <= 10; k++) {
-
-
                     DatabaseReference branchyeartablesubjectRef  = branchyearRef.child("table").child("subjects").child("sub" + k + "");
                     DatabaseReference myRef4 = branchyeartablesubjectRef.child("subcode");
                     myRef4.setValue(branches[p]+"501");
@@ -132,6 +130,8 @@ public class MainActivity extends AppCompatActivity {
                     myRef4.setValue("Sanjay Kumar");
                     myRef4 = branchyeartablesubjectRef.child("subjectname");
                     myRef4.setValue("Optimisation");
+                    myRef4=branchyeartablesubjectRef.child("teacherid");
+                    myRef4.setValue("2016027@p.com");
                 }
 
             }
