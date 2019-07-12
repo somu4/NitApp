@@ -35,10 +35,17 @@ public class MedicalFragment extends Fragment implements View.OnClickListener {
         callambulanceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(Intent.ACTION_DIAL);
+//                Intent i = new Intent(Intent.ACTION_DIAL);
+//
+//                i.setData(Uri.parse("tel:1234567890"));
+//                startActivity(i);
 
-                i.setData(Uri.parse("tel:1234567890"));
-                startActivity(i);
+                FirebaseAuth.getInstance().signOut();
+                userLocalStore.clearUserData();
+                Intent intent = new Intent(getActivity(), LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                getActivity().finish();
 
 
             }
@@ -64,12 +71,12 @@ public class MedicalFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.nearby_hospitals_view:
-                FirebaseAuth.getInstance().signOut();
-                userLocalStore.clearUserData();
-                Intent intent = new Intent(getActivity(), LoginActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                FirebaseAuth.getInstance().signOut();
+//                userLocalStore.clearUserData();
+                Intent intent = new Intent(getActivity(), myHostelComplaints.class);
+        //        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
-                getActivity().finish();
+                //getActivity().finish();
                 break;
             case R.id.call_ambulance_view:
                 break;

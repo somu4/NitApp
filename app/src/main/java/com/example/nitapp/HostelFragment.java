@@ -51,7 +51,7 @@ public class HostelFragment extends Fragment implements AdapterView.OnItemSelect
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference myRef;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private DatabaseReference myRefMyComplaints= database.getReference("mycomplaints").child(mAuth.getUid());;
+    private DatabaseReference myRefMyComplaints= database.getReference("mycomplaints").child(mAuth.getUid());
     private UserLocalStore userLocalStore;
     private StudentDataClass studentDataClass;
 
@@ -224,38 +224,7 @@ public class HostelFragment extends Fragment implements AdapterView.OnItemSelect
 }
 
 
-class MyComplaintsListAdapter extends ArrayAdapter<ComplaintDataClass>{
-    private Activity context;
-    private List<ComplaintDataClass> myComplaintsList;
 
-    public MyComplaintsListAdapter(Activity context, List<ComplaintDataClass> myComplaintsList){
-        super(context,R.layout.list_layout_my_complaints,myComplaintsList);
-        this.context=context;
-        this.myComplaintsList=myComplaintsList;
-    }
-
-    @NonNull
-    @Override
-    public View getView(int position,  View convertView,  ViewGroup parent) {
-        LayoutInflater inflater = context.getLayoutInflater();
-
-        View listViewItem = inflater.inflate(R.layout.list_layout_my_complaints,null,true);
-        TextView textViewComplaintId= listViewItem.findViewById(R.id.textview_complaint_id);
-        TextView textViewComplaintType= listViewItem.findViewById(R.id.textview_complaint_type);
-        TextView textViewComplaintDateandTime = listViewItem.findViewById(R.id.textview_complaint_datetime);
-        TextView textViewComplaintDescription= listViewItem.findViewById(R.id.textview_complaint_description);
-        ComplaintDataClass complaintDataClass = myComplaintsList.get(position);
-
-        textViewComplaintId.setText(complaintDataClass.getComplaintId());
-        textViewComplaintType.setText(complaintDataClass.getComplaintType());
-        textViewComplaintDateandTime.setText(complaintDataClass.getDateandtime());
-        textViewComplaintDescription.setText(complaintDataClass.getComplaintDescription());
-
-
-
-        return listViewItem;
-    }
-}
 
 
 class MyComplaint{
@@ -296,3 +265,4 @@ class MyComplaint{
         this.complaintType = complaintType;
     }
 }
+
